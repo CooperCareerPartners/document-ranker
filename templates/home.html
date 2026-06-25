@@ -7,9 +7,36 @@
         nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 50px; background: white; border-bottom: 1px solid #e5e7eb; }
         .brand { font-weight: 800; font-size: 22px; }
         nav a { margin-left: 24px; text-decoration: none; color: #334155; font-weight: 600; }
-        .hero { padding: 90px 50px; text-align: center; background: linear-gradient(180deg, #ffffff, #eef6ff); }
-        .hero h1 { font-size: 52px; max-width: 900px; margin: auto; line-height: 1.1; }
-        .hero p { font-size: 21px; max-width: 760px; margin: 24px auto; color: #475569; }
+  .hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    padding: 80px 70px;
+    background: linear-gradient(180deg, #ffffff, #eef6ff);
+}
+
+.hero-left {
+    flex: 1;
+}
+
+.hero-left h1 {
+    font-size: 52px;
+    line-height: 1.1;
+}
+
+.hero-left p {
+    font-size: 20px;
+    color: #475569;
+}
+
+.hero-photo img {
+    width: 360px;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 20px 50px rgba(37, 99, 235, 0.25);
+}
         .button { display: inline-block; margin: 10px; padding: 15px 24px; border-radius: 8px; text-decoration: none; font-weight: 700; }
         .primary { background: #2563eb; color: white; }
         .secondary { background: #0f172a; color: white; }
@@ -39,31 +66,29 @@
 </nav>
 
 <section class="hero">
-    <div class="tag">Recruiting • Talent Strategy • Career Services</div>
-    <h1>Modern recruiting support for high-growth teams and ambitious professionals.</h1>
-    <p>
-        I help companies find GTM, software, tech, and executive talent — and I help job seekers improve resumes,
-        LinkedIn profiles, and interview performance.
-    </p>
-    <a class="button primary" href="/candidate-matcher">Try Candidate Matcher</a>
-    <a class="button secondary" href="/upwork" target="_blank">Hire Me on Upwork</a>
-</section>
+    <div class="hero-left">
+        <div class="tag">Recruiting • Talent Strategy • Career Services</div>
 
-<section class="section">
-    <div class="about">
-        <h2>Recruiting expertise with a modern SaaS mindset.</h2>
+        <h1>Find Better Talent. Hire Faster. Advance Your Career.</h1>
+
         <p>
-            I’m Derek Cooper, founder of Cooper Career Partners. With 8 years of recruiting experience, I specialize in
-            GTM roles, software and technology hiring, product leadership, developers, and executive search.
+            I help companies find GTM, software, tech, and executive talent —
+            and I help job seekers improve resumes, LinkedIn profiles,
+            and interview performance.
         </p>
-        <p>
-            Whether you are scaling a team, improving your recruiting process, or preparing for your next career move,
-            I provide practical recruiting expertise supported by modern tools and technology.
-        </p>
+
+        <div class="buttons">
+            <a class="button primary" href="#employers">I'm Hiring Talent</a>
+            <a class="button secondary" href="#jobseekers">I'm Looking for a Job</a>
+        </div>
+    </div>
+
+    <div class="hero-photo">
+        <img src="{{ url_for('static', filename='headshot.jpg') }}" alt="Derek Cooper">
     </div>
 </section>
 
-<section class="section">
+<section id="employers" class="section">
     <h2>Services for Employers</h2>
     <div class="grid">
         <div class="card">
@@ -81,7 +106,7 @@
     </div>
 </section>
 
-<section class="section">
+<section id="jobseekers" class="section">
     <h2>Services for Job Seekers</h2>
     <div class="grid">
         <div class="card">
