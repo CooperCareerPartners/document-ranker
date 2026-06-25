@@ -3,6 +3,24 @@
 <head>
     <title>Derek Cooper | Cooper Career Partners</title>
     <style>
+.consult-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #2563eb;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+    z-index: 999;
+    transition: transform 0.2s ease;
+}
+
+.consult-button:hover {
+    transform: translateY(-3px);
+}
         body { margin: 0; font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
         nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 50px; background: white; border-bottom: 1px solid #e5e7eb; }
         .brand { font-weight: 800; font-size: 22px; }
@@ -50,6 +68,8 @@
         .about { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); }
         footer { text-align: center; padding: 35px; color: #64748b; }
     </style>
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 </head>
 
 <body>
@@ -148,6 +168,12 @@
 <footer>
     © 2026 Derek Cooper | Cooper Career Partners
 </footer>
-
+<a
+    class="consult-button"
+    href=""
+    onclick="Calendly.initPopupWidget({url: 'https://calendly.com/derek-coopercareerpartners/interview-coaching'}); return false;"
+>
+    Book Strategy Call
+</a>
 </body>
 </html>
