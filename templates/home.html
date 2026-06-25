@@ -1,29 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cooper Career Partners</title>
+    <title>Derek Cooper | Cooper Career Partners</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; color: #1f2937; }
-        nav { background: #0d1b2a; padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; }
-        nav a { color: white; text-decoration: none; margin-left: 22px; font-weight: bold; }
-        .brand { color: white; font-size: 22px; font-weight: bold; }
-        .hero { padding: 80px 40px; text-align: center; background: white; }
-        .hero h1 { font-size: 44px; margin-bottom: 15px; color: #0d1b2a; }
-        .hero p { font-size: 20px; max-width: 750px; margin: auto; color: #4b5563; }
-        .buttons { margin-top: 30px; }
-        .button { display: inline-block; padding: 14px 22px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; margin: 8px; font-weight: bold; }
-        .button.secondary { background: #0d1b2a; }
-        .section { max-width: 1000px; margin: 40px auto; padding: 0 25px; }
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 24px; border-radius: 10px; box-shadow: 0 0 10px #ddd; }
-        .card h3 { color: #0d1b2a; }
-        footer { text-align: center; padding: 30px; color: #6b7280; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 50px; background: white; border-bottom: 1px solid #e5e7eb; }
+        .brand { font-weight: 800; font-size: 22px; }
+        nav a { margin-left: 24px; text-decoration: none; color: #334155; font-weight: 600; }
+        .hero { padding: 90px 50px; text-align: center; background: linear-gradient(180deg, #ffffff, #eef6ff); }
+        .hero h1 { font-size: 52px; max-width: 900px; margin: auto; line-height: 1.1; }
+        .hero p { font-size: 21px; max-width: 760px; margin: 24px auto; color: #475569; }
+        .button { display: inline-block; margin: 10px; padding: 15px 24px; border-radius: 8px; text-decoration: none; font-weight: 700; }
+        .primary { background: #2563eb; color: white; }
+        .secondary { background: #0f172a; color: white; }
+        .section { max-width: 1100px; margin: 60px auto; padding: 0 30px; }
+        .section h2 { font-size: 34px; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-top: 30px; }
+        .card { background: white; padding: 28px; border-radius: 14px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); }
+        .card h3 { margin-top: 0; color: #0f172a; }
+        .card p { color: #475569; line-height: 1.6; }
+        .tag { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 7px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+        .about { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); }
+        footer { text-align: center; padding: 35px; color: #64748b; }
     </style>
 </head>
+
 <body>
 
 <nav>
-    <div class="brand">Cooper Career Partners</div>
+    <div class="brand">Derek Cooper | Cooper Career Partners</div>
     <div>
         <a href="/">Home</a>
         <a href="/candidate-matcher">Candidate Matcher</a>
@@ -33,50 +38,90 @@
     </div>
 </nav>
 
-<div class="hero">
-    <h1>Recruiting Support Built for Better Hiring</h1>
+<section class="hero">
+    <div class="tag">Recruiting • Talent Strategy • Career Services</div>
+    <h1>Modern recruiting support for high-growth teams and ambitious professionals.</h1>
     <p>
-        Cooper Career Partners helps companies and professionals improve hiring outcomes through recruiting support,
-        resume services, candidate matching, and sourcing tools.
+        I help companies find GTM, software, tech, and executive talent — and I help job seekers improve resumes,
+        LinkedIn profiles, and interview performance.
     </p>
+    <a class="button primary" href="/candidate-matcher">Try Candidate Matcher</a>
+    <a class="button secondary" href="/upwork" target="_blank">Hire Me on Upwork</a>
+</section>
 
-    <div class="buttons">
-        <a class="button" href="/candidate-matcher">Try Candidate Matcher</a>
-        <a class="button secondary" href="/upwork" target="_blank">View Upwork Profile</a>
+<section class="section">
+    <div class="about">
+        <h2>Recruiting expertise with a modern SaaS mindset.</h2>
+        <p>
+            I’m Derek Cooper, founder of Cooper Career Partners. With 8 years of recruiting experience, I specialize in
+            GTM roles, software and technology hiring, product leadership, developers, and executive search.
+        </p>
+        <p>
+            Whether you are scaling a team, improving your recruiting process, or preparing for your next career move,
+            I provide practical recruiting expertise supported by modern tools and technology.
+        </p>
     </div>
-</div>
+</section>
 
-<div class="section">
-    <h2>Services & Tools</h2>
-
-    <div class="cards">
+<section class="section">
+    <h2>Services for Employers</h2>
+    <div class="grid">
         <div class="card">
-            <h3>Recruiting Services</h3>
-            <p>Full-cycle recruiting support, candidate screening, talent search strategy, and hiring process assistance.</p>
+            <h3>Talent Search</h3>
+            <p>Find qualified sales, marketing, product, engineering, technology, and executive candidates.</p>
         </div>
+        <div class="card">
+            <h3>Recruiting Process Design</h3>
+            <p>Build scalable recruiting systems, screening workflows, candidate pipelines, and hiring processes.</p>
+        </div>
+        <div class="card">
+            <h3>Talent Acquisition Consulting</h3>
+            <p>Get strategic support for sourcing, interviewing, hiring strategy, and recruiting operations.</p>
+        </div>
+    </div>
+</section>
 
+<section class="section">
+    <h2>Services for Job Seekers</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Resume Writing</h3>
+            <p>Improve your resume with clearer positioning, stronger bullet points, and role-specific messaging.</p>
+        </div>
+        <div class="card">
+            <h3>LinkedIn Optimization</h3>
+            <p>Upgrade your profile so recruiters and hiring managers quickly understand your value.</p>
+        </div>
+        <div class="card">
+            <h3>Interview Coaching</h3>
+            <p>Prepare stronger answers, communicate your experience clearly, and improve interview confidence.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Tools & Programs</h2>
+    <div class="grid">
         <div class="card">
             <h3>Candidate Matcher</h3>
-            <p>Upload job descriptions, search criteria, and resumes to rank candidates based on relevance.</p>
-            <a href="/candidate-matcher">Open Tool</a>
+            <p>Upload resumes and compare them against a job description or search criteria.</p>
+            <a href="/candidate-matcher">Open Candidate Matcher</a>
         </div>
-
         <div class="card">
             <h3>Resume Writer Program</h3>
-            <p>A resume improvement tool designed to help professionals create stronger, clearer career documents.</p>
+            <p>A future tool to help job seekers improve resumes faster and more strategically.</p>
             <a href="/resume-writer">Coming Soon</a>
         </div>
-
         <div class="card">
             <h3>Candidate Sourcing Program</h3>
-            <p>A sourcing and search assistant for identifying candidates based on skills, titles, industries, and keywords.</p>
+            <p>A future sourcing assistant for identifying candidates by role, skill, industry, and experience.</p>
             <a href="/candidate-sourcing">Coming Soon</a>
         </div>
     </div>
-</div>
+</section>
 
 <footer>
-    © 2026 Cooper Career Partners
+    © 2026 Derek Cooper | Cooper Career Partners
 </footer>
 
 </body>
