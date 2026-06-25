@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from pypdf import PdfReader
 from docx import Document
 import os
@@ -10,7 +10,6 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
-# ---------- FILE READERS ----------
 def read_pdf(path):
     text = ""
     try:
@@ -39,10 +38,8 @@ def read_file(path):
     return ""
 
 
-# ---------- SCORING ----------
 def score_candidate(resume_text, criteria_text):
     criteria_words = criteria_text.lower().split()
-
     score = 0
     matched_words = []
 
@@ -59,8 +56,12 @@ def score_candidate(resume_text, criteria_text):
     return score, matched_words
 
 
-# ---------- ROUTE ----------
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+
+@app.route("/candidate-matcher", methods=["GET", "POST"])
 def index():
     results = []
 
@@ -72,12 +73,8 @@ def index():
 
         jd_text = ""
 
-        # Save job description if uploaded
         if jd_file and jd_file.filename != "":
-            jd_path = os.path.join(
-                app.config["UPLOAD_FOLDER"],
-                jd_file.filename
-            )
+            jd_path = os.path.join(app.config["UPLOAD_FOLDER"], jd_file.filename)
             jd_file.save(jd_path)
             jd_text = read_file(jd_path)
 
@@ -95,27 +92,18 @@ def index():
 
         saved_resume_paths = []
 
-        # Save resumes
         for resume in resume_files:
             if resume.filename == "":
                 continue
 
-            path = os.path.join(
-                app.config["UPLOAD_FOLDER"],
-                resume.filename
-            )
-
+            path = os.path.join(app.config["UPLOAD_FOLDER"], resume.filename)
             resume.save(path)
             saved_resume_paths.append(path)
 
-        # Score resumes
         for path in saved_resume_paths:
             resume_text = read_file(path)
 
-            score, matches = score_candidate(
-                resume_text,
-                combined_criteria
-            )
+            score, matches = score_candidate(resume_text, combined_criteria)
 
             results.append({
                 "name": os.path.basename(path),
@@ -126,15 +114,24 @@ def index():
             if os.path.exists(path):
                 os.remove(path)
 
-        results.sort(
-            key=lambda candidate: candidate["score"],
-            reverse=True
-        )
+        results.sort(key=lambda candidate: candidate["score"], reverse=True)
 
-    return render_template(
-        "index.html",
-        results=results
-    )
+    return render_template("index.html", results=results)
+
+
+@app.route("/resume-writer")
+def resume_writer():
+    return render_template("resume_writer.html")
+
+
+@app.route("/candidate-sourcing")
+def candidate_sourcing():
+    return render_template("candidate_sourcing.html")
+
+
+@app.route("/upwork")
+def upwork():
+    return redirect("https://www.upwork.com/freelancers/~0187a46036bf325d2a?mp_source=share")
 
 
 if __name__ == "__main__":
