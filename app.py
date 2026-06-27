@@ -51,21 +51,30 @@ def read_file(path):
 
 
 def score_candidate(resume_text, criteria_text):
-    criteria_words = criteria_text.lower().split()
-    score = 0
+    criteria_words = criteria_text.lower().replace(",", " ").split()
+
+    important_words = []
     matched_words = []
 
     for word in criteria_words:
-        if len(word) < 3:
+        clean_word = "".join(char for char in word if char.isalnum())
+
+        if len(clean_word) < 3:
             continue
 
-        occurrences = resume_text.count(word)
+        if clean_word not in important_words:
+            important_words.append(clean_word)
 
-        if occurrences > 0:
-            score += occurrences
+    if not important_words:
+        return 0, []
+
+    for word in important_words:
+        if word in resume_text:
             matched_words.append(word)
 
-    return score, matched_words
+    match_percent = round((len(matched_words) / len(important_words)) * 100)
+
+    return match_percent, matched_words
 
 
 @app.route("/")

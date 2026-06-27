@@ -2,96 +2,201 @@
 <html>
 <head>
     <title>Candidate Matcher | Cooper Career Partners</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
             margin: 0;
-            padding: 40px;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
             color: #0f172a;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
             background: white;
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        h1 {
+        nav a {
+            margin-left: 22px;
+            text-decoration: none;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .hero {
+            padding: 55px 30px;
             text-align: center;
-            margin-bottom: 30px;
+            background: linear-gradient(180deg, #ffffff, #eef6ff);
+        }
+
+        .hero h1 {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 19px;
+            max-width: 760px;
+            margin: auto;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            max-width: 1150px;
+            margin: 45px auto;
+            padding: 0 25px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
         }
 
         label {
             display: block;
-            margin-top: 20px;
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
-        input[type="text"],
-        textarea {
-            width: 100%;
-            padding: 14px;
-            margin-top: 8px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
+        .upload-box {
+            border: 2px dashed #93c5fd;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 14px;
+            min-height: 95px;
         }
 
         input[type="file"] {
-            margin-top: 10px;
+            width: 100%;
         }
 
-        button {
+        textarea {
             width: 100%;
-            margin-top: 30px;
-            padding: 16px;
+            height: 145px;
+            padding: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 15px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .helper {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 28px;
+            padding: 17px;
             background: #2563eb;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 18px;
+            font-weight: 800;
             cursor: pointer;
-            font-weight: bold;
         }
 
-        button:hover {
+        .submit-btn:hover {
             background: #1d4ed8;
-        }
-
-        .results {
-            margin-top: 40px;
-        }
-
-        .candidate {
-            background: #f8fafc;
-            border-left: 5px solid #2563eb;
-            padding: 20px;
-            margin-bottom: 18px;
-            border-radius: 8px;
-        }
-
-        .score {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2563eb;
-        }
-
-        .matches {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #444;
         }
 
         .error {
             background: #fee2e2;
             color: #991b1b;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-top: 20px;
+            font-weight: 700;
+        }
+
+        .results-header {
+            margin-top: 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-header h2 {
+            margin: 0;
+        }
+
+        .result-count {
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .candidate-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 18px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            border-left: 6px solid #2563eb;
+        }
+
+        .candidate-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .candidate-name {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .match-score {
+            font-size: 30px;
+            font-weight: 900;
+            color: #2563eb;
+        }
+
+        .recommendation {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .matches {
+            margin-top: 15px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            margin-top: 25px;
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 14px;
+            color: #64748b;
         }
 
         .back-link {
@@ -99,57 +204,142 @@
             margin-bottom: 25px;
             text-decoration: none;
             color: #2563eb;
-            font-weight: bold;
+            font-weight: 800;
+        }
+
+        @media (max-width: 800px) {
+            nav {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .candidate-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero h1 {
+                font-size: 34px;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
+<nav>
+    <div class="brand">Cooper Career Partners</div>
+    <div>
+        <a href="/">Home</a>
+        <a href="/resume-writer">Resume Writer</a>
+        <a href="/upwork" target="_blank">Upwork</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Candidate Matcher</h1>
+    <p>
+        Upload a job description or enter search criteria, then upload candidate resumes.
+        The tool ranks candidates based on how closely their resumes match the role.
+    </p>
+</section>
+
+<div class="wrapper">
 
     <a class="back-link" href="/">← Back to Home</a>
 
-    <h1>Candidate Matcher</h1>
+    <div class="tool-card">
 
-    <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
 
-        <label>Upload Job Description (optional)</label>
-        <input type="file" name="job_description">
+            <div class="form-grid">
 
-        <label>Or Enter Search Criteria</label>
-        <textarea name="criteria" rows="5" placeholder="Example: 5+ years SaaS sales, enterprise accounts, healthcare, Salesforce, full-cycle recruiting"></textarea>
+                <div>
+                    <label>Job Description</label>
+                    <div class="upload-box">
+                        <input type="file" name="job_description" accept=".pdf,.docx">
+                        <div class="helper">Optional. Upload a PDF or Word job description.</div>
+                    </div>
+                </div>
 
-        <label>Upload Candidate Resumes</label>
-        <input type="file" name="resumes" multiple>
+                <div>
+                    <label>Candidate Resumes</label>
+                    <div class="upload-box">
+                        <input type="file" name="resumes" accept=".pdf,.docx" multiple required>
+                        <div class="helper">Required. Upload multiple PDF or Word resumes.</div>
+                    </div>
+                </div>
 
-        <button type="submit">Match Candidates</button>
-    </form>
+            </div>
 
-    {% if error %}
-        <div class="error">
-            {{ error }}
+            <label style="margin-top: 25px;">Search Criteria</label>
+            <textarea name="criteria" placeholder="Example: 5+ years SaaS sales, enterprise accounts, Salesforce, healthcare, full-cycle recruiting"></textarea>
+            <div class="helper">
+                Optional if you upload a job description. Best results come from using both a job description and search criteria.
+            </div>
+
+            <button class="submit-btn" type="submit">Rank Candidates</button>
+
+        </form>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+    </div>
+
+    <div class="results-header">
+        <h2>Ranked Results</h2>
+
+        {% if results %}
+            <div class="result-count">{{ results|length }} candidates analyzed</div>
+        {% endif %}
+    </div>
+
+    {% if results %}
+        {% for candidate in results %}
+            <div class="candidate-card">
+                <div class="candidate-top">
+                    <div>
+                        <div class="candidate-name">{{ candidate.name }}</div>
+
+                        {% if candidate.score >= 75 %}
+                            <div class="recommendation">Strong Match</div>
+                        {% elif candidate.score >= 35 %}
+                            <div class="recommendation">Potential Match</div>
+                        {% else %}
+                            <div class="recommendation">Lower Match</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="match-score">
+                        {{ candidate.score }}%
+                    </div>
+                </div>
+
+                {% if candidate.matches %}
+                    <div class="matches">
+                        <strong>Matched terms:</strong>
+                        {{ candidate.matches | join(", ") }}
+                    </div>
+                {% else %}
+                    <div class="matches">
+                        No strong keyword matches found.
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            No results yet. Upload resumes and provide a job description or search criteria to rank candidates.
         </div>
     {% endif %}
 
-    <div class="results">
-        <h2>Results</h2>
+</div>
 
-        {% if results %}
-            {% for candidate in results %}
-                <div class="candidate">
-                    <h3>{{ candidate.name }}</h3>
-
-                    <div class="score">
-                        Match Score: {{ candidate.score }}
-                    </div>
-
-                    <div class="matches">
-                        <strong>Matched Keywords:</strong>
-                        {{ candidate.matches | join(", ") }}
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No results yet. Upload resumes and provide a job description or criteria.</p>
-        {% endif %}
-    </div>
+</body>
+</html>
