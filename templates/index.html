@@ -277,7 +277,26 @@
             </div>
 
             <label style="margin-top: 25px;">Search Criteria</label>
-            <textarea name="criteria" placeholder="Example: 5+ years SaaS sales, enterprise accounts, Salesforce, healthcare, full-cycle recruiting"></textarea>
+            <label style="margin-top: 25px;">Required Skills / Must-Haves</label>
+<textarea name="required_skills" placeholder="Example:
+enterprise SaaS sales
+Salesforce
+5+ years sales experience
+healthcare industry
+full-cycle recruiting"></textarea>
+<div class="helper">
+    These are weighted heavily and make up 70% of the match score.
+</div>
+
+<label style="margin-top: 25px;">Preferred Skills / Nice-to-Haves</label>
+<textarea name="preferred_skills" placeholder="Example:
+startup experience
+HubSpot
+leadership experience
+remote team experience"></textarea>
+<div class="helper">
+    These make up 30% of the match score.
+</div>
             <div class="helper">
                 Optional if you upload a job description. Best results come from using both a job description and search criteria.
             </div>
@@ -300,44 +319,55 @@
         {% endif %}
     </div>
 
-    {% if results %}
-        {% for candidate in results %}
-            <div class="candidate-card">
-                <div class="candidate-top">
-                    <div>
-                        <div class="candidate-name">{{ candidate.name }}</div>
-
-                        {% if candidate.score >= 75 %}
-                            <div class="recommendation">Strong Match</div>
-                        {% elif candidate.score >= 35 %}
-                            <div class="recommendation">Potential Match</div>
-                        {% else %}
-                            <div class="recommendation">Lower Match</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="match-score">
-                        {{ candidate.score }}%
-                    </div>
+   {% if results %}
+    {% for candidate in results %}
+        <div class="candidate-card">
+            <div class="candidate-top">
+                <div>
+                    <div class="candidate-name">{{ candidate.name }}</div>
+		    <div class="matches">
+    			<strong>Email:</strong> {{ candidate.email }}<br>
+    			<strong>Phone:</strong> {{ candidate.phone }}<br>
+    			<strong>File:</strong> {{ candidate.file_name }}
+		    </div>
+                    <div class="recommendation">{{ candidate.recommendation }}</div>
                 </div>
+		
+                <div class="match-score">
+                    {{ candidate.score }}%
+                </div>
+            </div>
+	    <div class="matches">
+    		<p><strong>Recruiter Summary:</strong> {{ candidate.summary }}</p>
 
-                {% if candidate.matches %}
-                    <div class="matches">
-                        <strong>Matched terms:</strong>
-                        {{ candidate.matches | join(", ") }}
-                    </div>
-                {% else %}
-                    <div class="matches">
-                        No strong keyword matches found.
-                    </div>
+    		{% if candidate.strengths %}
+        	    <p><strong>Strengths:</strong> {{ candidate.strengths | join(", ") }}</p>
+    		{% endif %}
+
+    		{% if candidate.risks %}
+        	    <p><strong>Risk Flags:</strong> {{ candidate.risks | join(", ") }}</p>
+    		{% endif %}
+	    </div>
+            <div class="matches">
+                {% if candidate.required_matches %}
+                    <p><strong>Required Matches:</strong> {{ candidate.required_matches | join(", ") }}</p>
+                {% endif %}
+
+                {% if candidate.preferred_matches %}
+                    <p><strong>Preferred Matches:</strong> {{ candidate.preferred_matches | join(", ") }}</p>
+                {% endif %}
+
+                {% if candidate.missing_required %}
+                    <p><strong>Missing Required:</strong> {{ candidate.missing_required | join(", ") }}</p>
                 {% endif %}
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="empty-state">
-            No results yet. Upload resumes and provide a job description or search criteria to rank candidates.
         </div>
-    {% endif %}
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        No results yet. Upload resumes and provide a job description or search criteria to rank candidates.
+    </div>
+{% endif %}
 
 </div>
 
