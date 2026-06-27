@@ -1,3 +1,221 @@
-<h1>Resume Writer Program</h1>
-<p>This tool is coming soon.</p>
-<a href="/">Back to Home</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Writing Services | Cooper Career Partners</title>
+
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 50px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        nav a {
+            margin-left: 20px;
+text-decoration: none;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 70px 20px;
+            background: linear-gradient(180deg, #ffffff, #eef6ff);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #475569;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .pricing {
+            max-width: 1200px;
+            margin: 60px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 0 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 15px 30px rgba(15,23,42,.08);
+            position: relative;
+        }
+
+        .featured {
+            border: 3px solid #2563eb;
+            transform: scale(1.03);
+        }
+
+        .badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .price {
+            font-size: 46px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        ul {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+
+        .button {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .faq {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 30px;
+        }
+
+        .faq h2 {
+            margin-bottom: 25px;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 22px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div><strong>Cooper Career Partners</strong></div>
+    <div>
+        <a href="/">Home</a>
+        <a href="/candidate-matcher">Candidate Matcher</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Get More Interviews with a Resume Built to Stand Out</h1>
+    <p>
+        Professionally crafted resumes, LinkedIn optimization, and executive career positioning
+        from a recruiter with 8+ years of experience.
+    </p>
+</section>
+
+<section class="pricing">
+
+    <div class="card">
+        <h2>Resume Refresh</h2>
+        <div class="price">$99</div>
+        <ul>
+            <li>Resume rewrite</li>
+            <li>ATS optimization</li>
+            <li>Bullet improvement</li>
+            <li>PDF delivery</li>
+        </ul>
+
+        <a class="button"
+           href="https://www.upwork.com/freelancers/~0187a46036bf325d2a?mp_source=share"
+           target="_blank">
+           Purchase on Upwork
+        </a>
+    </div>
+
+    <div class="card featured">
+        <div class="badge">MOST POPULAR</div>
+        <h2>Career Accelerator</h2>
+        <div class="price">$249</div>
+        <ul>
+            <li>Everything in Resume Refresh</li>
+            <li>LinkedIn optimization</li>
+            <li>Recruiter visibility improvements</li>
+            <li>Personal branding strategy</li>
+        </ul>
+
+        <a class="button"
+           href="https://www.upwork.com/freelancers/~0187a46036bf325d2a?mp_source=share"
+           target="_blank">
+           Purchase on Upwork
+        </a>
+    </div>
+
+    <div class="card">
+        <h2>Executive Package</h2>
+        <div class="price">$349</div>
+        <ul>
+            <li>Resume rewrite</li>
+            <li>LinkedIn optimization</li>
+            <li>Interview coaching</li>
+            <li>Executive positioning</li>
+        </ul>
+
+        <a class="button"
+           href="#"
+           onclick="Calendly.initPopupWidget({url: 'https://calendly.com/derek-coopercareerpartners/interview-coaching'}); return false;">
+           Schedule Consultation
+        </a>
+    </div>
+
+</section>
+
+<section class="faq">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+        <strong>How long does turnaround take?</strong>
+        <p>Typical turnaround is 3–5 business days.</p>
+    </div>
+
+    <div class="faq-item">
+        <strong>Do you work with tech and GTM professionals?</strong>
+        <p>Yes — I specialize in sales, marketing, product, engineering, and executive-level professionals.</p>
+    </div>
+
+    <div class="faq-item">
+        <strong>Will my resume be ATS optimized?</strong>
+        <p>Yes. Every package includes ATS optimization and recruiter-friendly formatting.</p>
+    </div>
+</section>
+
+</body>
+</html>
