@@ -1,55 +1,155 @@
- font-size: 14px;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Candidate Matcher | Cooper Career Partners</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+            color: #0f172a;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 30px;
+            padding: 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .results {
+            margin-top: 40px;
+        }
+
+        .candidate {
+            background: #f8fafc;
+            border-left: 5px solid #2563eb;
+            padding: 20px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+        }
+
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .matches {
+            margin-top: 10px;
+            font-size: 14px;
             color: #444;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 25px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
         }
     </style>
 </head>
-
 <body>
 
 <div class="container">
+
+    <a class="back-link" href="/">← Back to Home</a>
 
     <h1>Candidate Matcher</h1>
 
     <form method="POST" enctype="multipart/form-data">
 
         <label>Upload Job Description (optional)</label>
-        <input type="file" name="job_description" accept=".pdf,.docx">
+        <input type="file" name="job_description">
 
         <label>Or Enter Search Criteria</label>
-        <textarea name="criteria" placeholder="Example: 5+ years SaaS sales, enterprise accounts, healthcare, Salesforce, full-cycle recruiting"></textarea>
+        <textarea name="criteria" rows="5" placeholder="Example: 5+ years SaaS sales, enterprise accounts, healthcare, Salesforce, full-cycle recruiting"></textarea>
 
         <label>Upload Candidate Resumes</label>
-        <input type="file" name="resumes" accept=".pdf,.docx" multiple required>
+        <input type="file" name="resumes" multiple>
 
         <button type="submit">Match Candidates</button>
-
     </form>
 
     {% if error %}
-        <div class="error">{{ error }}</div>
+        <div class="error">
+            {{ error }}
+        </div>
     {% endif %}
 
-    <h2>Results</h2>
+    <div class="results">
+        <h2>Results</h2>
 
-    {% if results %}
-        {% for candidate in results %}
-            <div class="candidate">
-                <div><strong>{{ candidate.name }}</strong></div>
-                <div class="score">Match Score: {{ candidate.score }}</div>
+        {% if results %}
+            {% for candidate in results %}
+                <div class="candidate">
+                    <h3>{{ candidate.name }}</h3>
 
-                {% if candidate.matches %}
+                    <div class="score">
+                        Match Score: {{ candidate.score }}
+                    </div>
+
                     <div class="matches">
-                        Matched terms:
+                        <strong>Matched Keywords:</strong>
                         {{ candidate.matches | join(", ") }}
                     </div>
-                {% endif %}
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No results yet. Upload resumes and provide a job description or criteria.</p>
-    {% endif %}
-
-</div>
-
-</body>
-</html>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No results yet. Upload resumes and provide a job description or criteria.</p>
+        {% endif %}
+    </div>
