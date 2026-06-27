@@ -48,6 +48,15 @@ text-decoration: none;
             margin: auto;
         }
 
+.announcement {
+    background: #dbeafe;
+    color: #1d4ed8;
+    text-align: center;
+    padding: 16px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
         .pricing {
             max-width: 1200px;
             margin: 60px auto;
@@ -81,6 +90,50 @@ text-decoration: none;
             font-size: 13px;
             font-weight: bold;
         }
+
+.badges {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    padding: 30px 20px;
+}
+
+.badge-item {
+    background: white;
+    padding: 14px 22px;
+    border-radius: 999px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    font-weight: bold;
+}
+
+.examples {
+    max-width: 1000px;
+    margin: 70px auto;
+    padding: 0 30px;
+}
+
+.examples h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.example-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.example-box {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 10px 20px rgba(0,0,0,.08);
+}
+
+.improved {
+    border: 3px solid #2563eb;
+}
 
         .price {
             font-size: 46px;
@@ -138,8 +191,18 @@ text-decoration: none;
     <h1>Get More Interviews with a Resume Built to Stand Out</h1>
     <p>
         Professionally crafted resumes, LinkedIn optimization, and executive career positioning
-        from a recruiter with 8+ years of experience.
+        from a recruiter with {{ years_experience }}+ years of experience.
     </p>
+</section>
+
+<section class="announcement">
+    <strong>Limited Availability:</strong> Only accepting 5 new resume clients this month.
+</section>
+
+<section class="badges">
+    <div class="badge-item">✓ 3–5 Day Turnaround</div>
+    <div class="badge-item">✓ ATS Optimized</div>
+    <div class="badge-item">✓ Recruiter Reviewed</div>
 </section>
 
 <section class="pricing">
@@ -196,6 +259,24 @@ text-decoration: none;
         </a>
     </div>
 
+</section>
+
+<div class="example-grid">
+        <div class="example-box">
+            <h3>Before</h3>
+            <p>
+                Responsible for sales calls and working with clients to generate revenue.
+            </p>
+        </div>
+
+        <div class="example-box improved">
+            <h3>After</h3>
+            <p>
+                Generated $2.1M in qualified pipeline by executing enterprise outbound strategy and
+                managing high-value client relationships across SaaS accounts.
+            </p>
+        </div>
+    </div>
 </section>
 
 <section class="faq">

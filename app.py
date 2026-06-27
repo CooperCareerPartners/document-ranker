@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 from pypdf import PdfReader
 from docx import Document
 import os
+from datetime import date
 
 app = Flask(__name__)
 
@@ -9,6 +10,17 @@ UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+def years_of_experience():
+    start_year = 2018
+    start_month = 1
+
+    today = date.today()
+    years = today.year - start_year
+
+    if today.month < start_month:
+        years -= 1
+
+    return years
 
 def read_pdf(path):
     text = ""
@@ -58,7 +70,10 @@ def score_candidate(resume_text, criteria_text):
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return render_template(
+        "home.html",
+        years_experience=years_of_experience()
+    )
 
 
 @app.route("/candidate-matcher", methods=["GET", "POST"])
@@ -121,7 +136,10 @@ def index():
 
 @app.route("/resume-writer")
 def resume_writer():
-    return render_template("resume_writer.html")
+    return render_template(
+        "resume_writer.html",
+        years_experience=years_of_experience()
+    )
 
 
 @app.route("/candidate-sourcing")
