@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from pypdf import PdfReader
 from docx import Document
 from sendgrid import SendGridAPIClient
@@ -13,6 +13,7 @@ import stripe
 from datetime import date
 
 app = Flask(__name__)
+app.secret_key = "change-this-later"
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
@@ -459,6 +460,26 @@ def send_job_alert_email(to_email, job):
         print("Email error:", e)
         return False
 
+def get_user_alert_status(email):
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT COUNT(*) as alert_count,
+               MAX(COALESCE(is_premium, 0)) as is_premium
+        FROM job_alerts
+        WHERE email = ?
+    """, (email,))
+
+    row = cursor.fetchone()
+    conn.close()
+
+    return {
+        "alert_count": row["alert_count"],
+        "is_premium": bool(row["is_premium"])
+    }
+
 @app.route("/job-alerts", methods=["GET", "POST"])
 def job_alerts():
     if request.method == "POST":
@@ -467,6 +488,15 @@ def job_alerts():
         work_type = request.form.get("work_type", "").strip()
         keywords = request.form.get("keywords", "").strip()
         email = request.form.get("email", "").strip()
+
+        user_status = get_user_alert_status(email)
+        print("USER STATUS:", user_status)
+
+        if user_status["alert_count"] >= 1 and not user_status["is_premium"]:
+            return render_template(
+                "job_alerts.html",
+                limit_reached=True
+            )
 
         search_terms = job_title
 
@@ -486,9 +516,17 @@ def job_alerts():
 
         cursor.execute("""
             INSERT INTO job_alerts
-            (job_title, location, work_type, keywords, email, linkedin_url)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (job_title, location, work_type, keywords, email, linkedin_url))
+            (job_title, location, work_type, keywords, email, linkedin_url, is_premium)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            job_title,
+            location,
+            work_type,
+            keywords,
+            email,
+            linkedin_url,
+            1 if user_status["is_premium"] else 0
+        ))
 
         conn.commit()
         conn.close()
@@ -586,7 +624,7 @@ def create_checkout_session():
                     "quantity": 1,
                 }
             ],
-            success_url=os.environ.get("DOMAIN_URL", "http://127.0.0.1:5000") + "/job-alerts?success=premium",
+            success_url=os.environ.get("DOMAIN_URL", "http://127.0.0.1:5000") + "/premium-success?session_id={CHECKOUT_SESSION_ID}",
             cancel_url=os.environ.get("DOMAIN_URL", "http://127.0.0.1:5000") + "/job-alerts",
         )
 
@@ -595,6 +633,127 @@ def create_checkout_session():
     except Exception as e:
         print("Stripe error:", e)
         return "Stripe checkout error", 500
+
+@app.route("/premium-success")
+def premium_success():
+    session_id = request.args.get("session_id")
+
+    if not session_id:
+        return "Missing Stripe session ID", 400
+
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+
+        customer_email = None
+        stripe_customer_id = None
+
+        if session.customer_details:
+            customer_email = session.customer_details.email
+
+        stripe_customer_id = session.customer
+
+        if not customer_email:
+            return "Could not find customer email", 400
+
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE job_alerts
+            SET is_premium = 1,
+                stripe_customer_id = ?
+            WHERE email = ?
+        """, (stripe_customer_id, customer_email))
+
+        conn.commit()
+        conn.close()
+
+        return render_template(
+            "job_alerts.html",
+            premium_success=True
+        )
+
+    except Exception as e:
+        print("Premium success error:", repr(e))
+        return f"Premium success error: {repr(e)}", 500
+
+@app.route("/admin-login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        password = request.form.get("password")
+        admin_password = os.environ.get("ADMIN_PASSWORD", "changeme")
+
+        if password == admin_password:
+            session["admin_authenticated"] = True
+            return redirect("/admin")
+
+        return render_template("admin_login.html", error="Incorrect password")
+
+    return render_template("admin_login.html")
+
+@app.route("/admin")
+def admin_dashboard():
+    if not session.get("admin_authenticated"):
+        return redirect("/admin-login")
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) AS total_alerts FROM job_alerts")
+    total_alerts = cursor.fetchone()["total_alerts"]
+
+    cursor.execute("SELECT COUNT(DISTINCT email) AS total_users FROM job_alerts")
+    total_users = cursor.fetchone()["total_users"]
+
+    cursor.execute("""
+        SELECT COUNT(DISTINCT email) AS premium_users
+        FROM job_alerts
+        WHERE COALESCE(is_premium, 0) = 1
+    """)
+    premium_users = cursor.fetchone()["premium_users"]
+
+    free_users = total_users - premium_users
+    mrr = premium_users * 9
+
+    cursor.execute("""
+        SELECT job_title, COUNT(*) AS count
+        FROM job_alerts
+        GROUP BY job_title
+        ORDER BY count DESC
+        LIMIT 5
+    """)
+    top_titles = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT location, COUNT(*) AS count
+        FROM job_alerts
+        GROUP BY location
+        ORDER BY count DESC
+        LIMIT 5
+    """)
+    top_locations = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT email, job_title, location, keywords, is_premium, created_at
+        FROM job_alerts
+        ORDER BY created_at DESC
+        LIMIT 25
+    """)
+    recent_alerts = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "admin.html",
+        total_alerts=total_alerts,
+        total_users=total_users,
+        premium_users=premium_users,
+        free_users=free_users,
+        mrr=mrr,
+        top_titles=top_titles,
+        top_locations=top_locations,
+        recent_alerts=recent_alerts
+    )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

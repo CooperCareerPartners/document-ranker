@@ -290,6 +290,21 @@
     <div class="panel">
         <h2>Create Your Job Alert</h2>
 
+        {% if premium_success %}
+        <div class="success">
+            <strong>Premium activated.</strong>
+            <p>Your email is now marked as Premium for Job Alerts.</p>
+        </div>
+        {% endif %}
+
+        {% if limit_reached %}
+        <div class="success" style="background:#fee2e2; color:#991b1b;">
+            <strong>Free alert limit reached.</strong>
+            <p>You already have 1 free job alert. Upgrade to Premium to create unlimited alerts.</p>
+            <a class="button" href="/create-checkout-session">Upgrade to Premium</a>
+        </div>
+        {% endif %}
+
         {% if success %}
         <div class="success">
             <strong>Your job alert has been saved.</strong>

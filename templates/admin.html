@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard | Cooper Career Partners</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 50px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .brand {
+            font-weight: 900;
+            font-size: 22px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 45px auto;
+            padding: 0 25px;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 35px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 900;
+            margin-top: 10px;
+            color: #2563eb;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .panel {
+            background: white;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 900;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .premium {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .free {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        @media (max-width: 850px) {
+            .section-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="brand">Cooper Career Partners Admin</div>
+    <div>
+        <a href="/">Home</a>
+        <a href="/job-alerts">Job Alerts</a>
+        <a href="/candidate-matcher">Candidate Matcher</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">Job Alerts usage, users, premium subscriptions, and search trends.</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">{{ total_users }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Free Users</div>
+            <div class="stat-value">{{ free_users }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Premium Users</div>
+            <div class="stat-value">{{ premium_users }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Estimated MRR</div>
+            <div class="stat-value">${{ mrr }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Total Alerts</div>
+            <div class="stat-value">{{ total_alerts }}</div>
+        </div>
+    </div>
+
+    <div class="section-grid">
+        <div class="panel">
+            <h2>Top Job Titles</h2>
+            {% for item in top_titles %}
+                <div class="row">
+                    <span>{{ item.job_title }}</span>
+                    <strong>{{ item.count }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="panel">
+            <h2>Top Locations</h2>
+            {% for item in top_locations %}
+                <div class="row">
+                    <span>{{ item.location }}</span>
+                    <strong>{{ item.count }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <h2>Recent Alerts</h2>
+
+    <table>
+        <tr>
+            <th>Email</th>
+            <th>Job Title</th>
+            <th>Location</th>
+            <th>Keywords</th>
+            <th>Plan</th>
+            <th>Created</th>
+        </tr>
+
+        {% for alert in recent_alerts %}
+        <tr>
+            <td>{{ alert.email }}</td>
+            <td>{{ alert.job_title }}</td>
+            <td>{{ alert.location }}</td>
+            <td>{{ alert.keywords }}</td>
+            <td>
+                {% if alert.is_premium %}
+                    <span class="badge premium">Premium</span>
+                {% else %}
+                    <span class="badge free">Free</span>
+                {% endif %}
+            </td>
+            <td>{{ alert.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>
