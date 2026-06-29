@@ -9,9 +9,12 @@ import re
 import sqlite3
 import urllib.parse
 import requests
+import stripe
 from datetime import date
 
 app = Flask(__name__)
+
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -49,6 +52,20 @@ def init_db():
             UNIQUE(alert_id, job_id)
         )
     """)
+
+    try:
+        cursor.execute(
+            "ALTER TABLE job_alerts ADD COLUMN is_premium INTEGER DEFAULT 0"
+        )
+    except:
+        pass
+
+    try:
+        cursor.execute(
+            "ALTER TABLE job_alerts ADD COLUMN stripe_customer_id TEXT"
+        )
+    except:
+        pass
 
     conn.commit()
     conn.close()
@@ -556,6 +573,28 @@ scheduler.add_job(
     hours=1
 )
 scheduler.start()
+
+@app.route("/create-checkout-session")
+def create_checkout_session():
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            mode="subscription",
+            line_items=[
+                {
+                    "price": os.environ.get("STRIPE_PRICE_ID"),
+                    "quantity": 1,
+                }
+            ],
+            success_url=os.environ.get("DOMAIN_URL", "http://127.0.0.1:5000") + "/job-alerts?success=premium",
+            cancel_url=os.environ.get("DOMAIN_URL", "http://127.0.0.1:5000") + "/job-alerts",
+        )
+
+        return redirect(checkout_session.url, code=303)
+
+    except Exception as e:
+        print("Stripe error:", e)
+        return "Stripe checkout error", 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
