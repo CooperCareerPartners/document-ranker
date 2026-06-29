@@ -2,3 +2,6 @@ flask
 pypdf
 python-docx
 gunicorn
+requests
+apscheduler
+sendgrid

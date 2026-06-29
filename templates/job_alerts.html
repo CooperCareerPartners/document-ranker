@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Alerts | Cooper Career Partners</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        nav {
+            padding: 22px 50px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        nav a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #334155;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 60px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(15,23,42,.08);
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        button, .button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 15px 22px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/candidate-matcher">Candidate Matcher</a>
+    <a href="/resume-writer">Resume Writer</a>
+</nav>
+
+<div class="container">
+    <h1>Job Alert Program</h1>
+
+    <p>
+        Enter your ideal job criteria and save an alert.  
+        Soon, automated email alerts will notify you when matching jobs appear.
+    </p>
+
+    {% if success %}
+    <div class="success">
+        <strong>Your job alert has been saved.</strong>
+        <p>Start with this LinkedIn search:</p>
+        <a class="button" href="{{ linkedin_url }}" target="_blank">
+            Open LinkedIn Job Search
+        </a>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+
+        <label>Job Title</label>
+        <input type="text" name="job_title" required>
+
+        <label>Location</label>
+        <input type="text" name="location" required>
+
+        <label>Work Type</label>
+        <select name="work_type">
+            <option>Any</option>
+            <option>Remote</option>
+            <option>Hybrid</option>
+            <option>Onsite</option>
+        </select>
+
+        <label>Additional Keywords</label>
+        <textarea name="keywords"></textarea>
+
+        <label>Email Address</label>
+        <input type="email" name="email" required>
+
+        <button type="submit">Create Job Alert</button>
+    </form>
+</div>
+
+</body>
+</html>
