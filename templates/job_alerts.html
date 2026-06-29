@@ -101,6 +101,41 @@
             margin-bottom: 6px;
         }
 
+        .pricing {
+            max-width: 1100px;
+            margin: 30px auto 70px;
+            padding: 0 25px;
+        }
+
+        .pricing h2 {
+            text-align: center;
+            font-size: 34px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .price-card {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        .price-card.featured {
+            border: 3px solid #2563eb;
+        }
+
+        .price {
+            font-size: 42px;
+            font-weight: 900;
+            color: #2563eb;
+        }
+
         label {
             display: block;
             margin-top: 18px;
@@ -208,7 +243,7 @@
     </div>
 </nav>
 
-<section class="hero">
+<section id="top" class="hero">
     <div class="tag">Early Applicant Advantage</div>
     <h1>Get job alerts faster so you can apply before the crowd.</h1>
     <p>
@@ -294,3 +329,39 @@
     </div>
 
 </div>
+
+<section class="pricing">
+    <h2>Job Alert Plans</h2>
+
+    <div class="pricing-grid">
+        <div class="price-card">
+            <h3>Free Alerts</h3>
+            <div class="price">$0</div>
+            <p>Best for job seekers who want a simple alert setup.</p>
+            <ul>
+                <li>1 saved job alert</li>
+                <li>Hourly job checks</li>
+                <li>Email notifications</li>
+                <li>LinkedIn search link</li>
+            </ul>
+            <a class="button" href="#top">Create Free Alert</a>
+        </div>
+
+        <div class="price-card featured">
+            <h3>Premium Alerts</h3>
+            <div class="price">$9/mo</div>
+            <p>For job seekers who want more coverage and faster action.</p>
+            <ul>
+                <li>Unlimited job alerts</li>
+                <li>Priority job checks</li>
+                <li>Multiple job titles and locations</li>
+                <li>Early applicant strategy tips</li>
+                <li>Future AI resume match scoring</li>
+            </ul>
+            <a class="button" href="#">Coming Soon</a>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
