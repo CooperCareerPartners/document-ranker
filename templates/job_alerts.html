@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Job Alerts | Cooper Career Partners</title>
+
     <style>
         body {
             margin: 0;
@@ -11,41 +12,99 @@
         }
 
         nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 22px 50px;
             background: white;
             border-bottom: 1px solid #e5e7eb;
         }
 
         nav a {
-            margin-right: 20px;
+            margin-left: 20px;
             text-decoration: none;
             color: #334155;
-            font-weight: bold;
+            font-weight: 700;
         }
 
-        .container {
+        .brand {
+            font-weight: 900;
+            font-size: 22px;
+        }
+
+        .hero {
+            padding: 75px 40px;
+            text-align: center;
+            background: linear-gradient(180deg, #ffffff, #eef6ff);
+        }
+
+        .hero h1 {
+            font-size: 52px;
             max-width: 850px;
-            margin: 60px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 18px;
-            box-shadow: 0 15px 35px rgba(15,23,42,.08);
+            margin: auto;
+            line-height: 1.1;
         }
 
-        h1 {
-            font-size: 42px;
-            margin-bottom: 10px;
-        }
-
-        p {
+        .hero p {
+            font-size: 20px;
             color: #475569;
+            max-width: 760px;
+            margin: 22px auto 0;
             line-height: 1.6;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .wrapper {
+            max-width: 1150px;
+            margin: 55px auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 30px;
+        }
+
+        .panel {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 30px;
+        }
+
+        .steps {
+            display: grid;
+            gap: 18px;
+        }
+
+        .step {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 14px;
+            border-left: 5px solid #2563eb;
+        }
+
+        .step strong {
+            display: block;
+            margin-bottom: 6px;
         }
 
         label {
             display: block;
-            margin-top: 20px;
-            font-weight: bold;
+            margin-top: 18px;
+            font-weight: 800;
         }
 
         input, select, textarea {
@@ -58,79 +117,180 @@
             font-size: 15px;
         }
 
+        textarea {
+            min-height: 95px;
+        }
+
         button, .button {
             display: inline-block;
+            width: 100%;
+            text-align: center;
             margin-top: 25px;
-            padding: 15px 22px;
+            padding: 16px 22px;
             background: #2563eb;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-weight: 900;
             text-decoration: none;
             cursor: pointer;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button:hover, .button:hover {
+            background: #1d4ed8;
         }
 
         .success {
             background: #dcfce7;
             color: #166534;
-            padding: 18px;
-            border-radius: 12px;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        .helper {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
             margin-top: 25px;
+        }
+
+        .badge {
+            background: #eef2ff;
+            color: #3730a3;
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .note {
+            margin-top: 22px;
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            nav {
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
         }
     </style>
 </head>
+
 <body>
 
 <nav>
-    <a href="/">Home</a>
-    <a href="/candidate-matcher">Candidate Matcher</a>
-    <a href="/resume-writer">Resume Writer</a>
+    <div class="brand">Cooper Career Partners</div>
+    <div>
+        <a href="/">Home</a>
+        <a href="/candidate-matcher">Candidate Matcher</a>
+        <a href="/resume-writer">Resume Writer</a>
+        <a href="/job-alerts">Job Alerts</a>
+    </div>
 </nav>
 
-<div class="container">
-    <h1>Job Alert Program</h1>
-
+<section class="hero">
+    <div class="tag">Early Applicant Advantage</div>
+    <h1>Get job alerts faster so you can apply before the crowd.</h1>
     <p>
-        Enter your ideal job criteria and save an alert.  
-        Soon, automated email alerts will notify you when matching jobs appear.
+        Create a personalized job alert based on title, location, work type, and keywords.
+        When new matching roles are found, you’ll receive an email alert with an apply link.
     </p>
+</section>
 
-    {% if success %}
-    <div class="success">
-        <strong>Your job alert has been saved.</strong>
-        <p>Start with this LinkedIn search:</p>
-        <a class="button" href="{{ linkedin_url }}" target="_blank">
-            Open LinkedIn Job Search
-        </a>
+<div class="wrapper">
+
+    <div class="panel">
+        <h2>How it works</h2>
+
+        <div class="steps">
+            <div class="step">
+                <strong>1. Tell us what you’re looking for</strong>
+                Enter your target job title, location, work style, and keywords.
+            </div>
+
+            <div class="step">
+                <strong>2. We scan for matching roles</strong>
+                Your alert checks job sources for relevant postings.
+            </div>
+
+            <div class="step">
+                <strong>3. You apply faster</strong>
+                When a new role appears, you get an email so you can apply quickly.
+            </div>
+        </div>
+
+        <div class="badges">
+            <div class="badge">Fast Alerts</div>
+            <div class="badge">Job Search Support</div>
+            <div class="badge">Recruiter-Built</div>
+            <div class="badge">Apply Earlier</div>
+        </div>
+
+        <p class="note">
+            This tool is designed to help job seekers move faster. It does not guarantee interviews,
+            but early applications can improve visibility when roles are newly posted.
+        </p>
     </div>
-    {% endif %}
 
-    <form method="POST">
+    <div class="panel">
+        <h2>Create Your Job Alert</h2>
 
-        <label>Job Title</label>
-        <input type="text" name="job_title" required>
+        {% if success %}
+        <div class="success">
+            <strong>Your job alert has been saved.</strong>
+            <p>Start with this LinkedIn search:</p>
+            <a class="button" href="{{ linkedin_url }}" target="_blank">
+                Open LinkedIn Job Search
+            </a>
+        </div>
+        {% endif %}
 
-        <label>Location</label>
-        <input type="text" name="location" required>
+        <form method="POST">
 
-        <label>Work Type</label>
-        <select name="work_type">
-            <option>Any</option>
-            <option>Remote</option>
-            <option>Hybrid</option>
-            <option>Onsite</option>
-        </select>
+            <label>Job Title</label>
+            <input type="text" name="job_title" placeholder="Example: Account Executive" required>
 
-        <label>Additional Keywords</label>
-        <textarea name="keywords"></textarea>
+            <label>Location</label>
+            <input type="text" name="location" placeholder="Example: Raleigh, NC or Remote" required>
 
-        <label>Email Address</label>
-        <input type="email" name="email" required>
+            <label>Work Type</label>
+            <select name="work_type">
+                <option>Any</option>
+                <option>Remote</option>
+                <option>Hybrid</option>
+                <option>Onsite</option>
+            </select>
 
-        <button type="submit">Create Job Alert</button>
-    </form>
+            <label>Additional Keywords</label>
+            <textarea name="keywords" placeholder="Example: SaaS, healthcare, AI, startup, Salesforce"></textarea>
+            <div class="helper">Use keywords to make your alert more specific.</div>
+
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="you@example.com" required>
+
+            <button type="submit">Create Job Alert</button>
+
+        </form>
+    </div>
+
 </div>
-
-</body>
-</html>
