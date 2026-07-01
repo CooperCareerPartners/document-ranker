@@ -1,9 +1,11 @@
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, session
 from pypdf import PdfReader
 from docx import Document
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from apscheduler.schedulers.background import BackgroundScheduler
+from openai import OpenAI
+from flask import make_response
+from xhtml2pdf import pisa
+from io import BytesIO
 import os
 import re
 import sqlite3
@@ -23,6 +25,23 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DATABASE = "job_alerts.db"
 
+PLAN_LIMITS = {
+    "free": {
+        "resumes": 1,
+        "job_alerts": 1,
+        "consultation": "None"
+    },
+    "pro": {
+        "resumes": 5,
+        "job_alerts": 5,
+        "consultation": "15-minute interview coaching consultation"
+    },
+    "accelerator": {
+        "resumes": None,
+        "job_alerts": None,
+        "consultation": "30-minute interview coaching consultation"
+    }
+}
 
 def init_db():
     conn = sqlite3.connect(DATABASE)
@@ -51,6 +70,29 @@ def init_db():
             job_apply_link TEXT,
             first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(alert_id, job_id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            plan TEXT DEFAULT 'free',
+            stripe_customer_id TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usage_tracking (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            resumes_used INTEGER DEFAULT 0,
+            job_alerts_used INTEGER DEFAULT 0,
+            billing_month TEXT NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            UNIQUE(user_id, billing_month)
         )
     """)
 
@@ -226,6 +268,186 @@ def score_candidate(resume_text, required_text, preferred_text):
         "missing_required": missing_required
     }
 
+def get_current_billing_month():
+    today = date.today()
+    return f"{today.year}-{today.month:02d}"
+
+def get_usage(user_id):
+    billing_month = get_current_billing_month()
+
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT * FROM usage_tracking
+        WHERE user_id = ? AND billing_month = ?
+    """, (user_id, billing_month))
+
+    usage = cursor.fetchone()
+
+    if not usage:
+        cursor.execute("""
+            INSERT INTO usage_tracking
+            (user_id, resumes_used, job_alerts_used, billing_month)
+            VALUES (?, 0, 0, ?)
+        """, (user_id, billing_month))
+        conn.commit()
+
+        cursor.execute("""
+            SELECT * FROM usage_tracking
+            WHERE user_id = ? AND billing_month = ?
+        """, (user_id, billing_month))
+
+        usage = cursor.fetchone()
+
+    conn.close()
+    return usage
+
+def can_use_resume(user_id, plan):
+    if plan == "accelerator":
+        return True
+
+    usage = get_usage(user_id)
+    limit = PLAN_LIMITS[plan]["resumes"]
+
+    return usage["resumes_used"] < limit
+
+def can_use_job_alert(user_id, plan):
+    if plan == "accelerator":
+        return True
+
+    usage = get_usage(user_id)
+    limit = PLAN_LIMITS[plan]["job_alerts"]
+
+    return usage["job_alerts_used"] < limit
+
+def increment_resume_usage(user_id):
+    get_usage(user_id)   # ensure row exists
+    billing_month = get_current_billing_month()
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE usage_tracking
+        SET resumes_used = resumes_used + 1
+        WHERE user_id = ? AND billing_month = ?
+    """, (user_id, billing_month))
+
+    conn.commit()
+    conn.close()
+
+def increment_job_alert_usage(user_id):
+    get_usage(user_id)   # ensure row exists
+    billing_month = get_current_billing_month()
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE usage_tracking
+        SET job_alerts_used = job_alerts_used + 1
+        WHERE user_id = ? AND billing_month = ?
+    """, (user_id, billing_month))
+
+    conn.commit()
+    conn.close()
+
+client = OpenAI()
+
+def generate_ai_resume_content(candidate_info, job_description):
+    prompt = f"""
+You are an expert resume writer and recruiter.
+
+Create ATS-optimized resume content using the candidate information and target job description.
+
+Return ONLY plain text.
+
+Each section MUST start on its own line.
+
+SUMMARY:
+[text]
+
+SKILLS:
+[text]
+
+EXPERIENCE:
+[Use ONLY <p>, <strong>, <ul>, and <li>. Do NOT include <html>, <body>, markdown, dashes, or bullet symbols.]
+
+ACHIEVEMENTS:
+[text]
+
+LEADERSHIP:
+[text]
+
+Candidate Information:
+{candidate_info}
+
+Target Job Description:
+{job_description}
+"""
+
+    try:
+        response = client.responses.create(
+            model="gpt-4.1-mini",
+            input=prompt
+        )
+        return response.output_text
+
+    except Exception as e:
+        print("OpenAI error:", e)
+        return ""
+
+def parse_ai_resume_sections(ai_output):
+    sections = {
+        "summary": "",
+        "skills": "",
+        "experience": "",
+        "achievements": "",
+        "leadership": ""
+    }
+
+    current_section = None
+
+    for raw_line in ai_output.splitlines():
+        line = raw_line.strip()
+        upper_line = line.upper()
+
+        if upper_line.startswith("SUMMARY:"):
+            current_section = "summary"
+            line = line.split(":", 1)[1].strip()
+
+        elif upper_line.startswith("SKILLS:"):
+            current_section = "skills"
+            line = line.split(":", 1)[1].strip()
+
+        elif upper_line.startswith("EXPERIENCE:"):
+            current_section = "experience"
+            line = line.split(":", 1)[1].strip()
+
+        elif upper_line.startswith("ACHIEVEMENTS:"):
+            current_section = "achievements"
+            line = line.split(":", 1)[1].strip()
+
+        elif upper_line.startswith("LEADERSHIP:"):
+            current_section = "leadership"
+            line = line.split(":", 1)[1].strip()
+
+        if current_section and line:
+            sections[current_section] += line + "\n"
+
+        sections["experience"] = (
+            sections["experience"]
+            .replace("<html>", "")
+            .replace("</html>", "")
+            .replace("<body>", "")
+            .replace("</body>", "")
+            .strip()
+        )
+
+    return sections
+
 @app.route("/")
 def home():
     return render_template(
@@ -233,6 +455,79 @@ def home():
         years_experience=years_of_experience()
     )
 
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "").strip()
+
+        if not email or not password:
+            return render_template("signup.html", error="Email and password are required.")
+
+        password_hash = generate_password_hash(password)
+
+        try:
+            conn = sqlite3.connect(DATABASE)
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO users (email, password_hash, plan)
+                VALUES (?, ?, ?)
+            """, (email, password_hash, "free"))
+
+            conn.commit()
+            conn.close()
+
+            return redirect("/login")
+
+        except sqlite3.IntegrityError:
+            return render_template("signup.html", error="An account with this email already exists.")
+
+    return render_template("signup.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "").strip()
+
+        conn = sqlite3.connect(DATABASE)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        user = cursor.fetchone()
+
+        conn.close()
+
+        if user and check_password_hash(user["password_hash"], password):
+            session["user_id"] = user["id"]
+            session["user_email"] = user["email"]
+            session["plan"] = user["plan"]
+            return redirect("/dashboard")
+
+        return render_template("login.html", error="Invalid email or password.")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
+@app.route("/dashboard")
+def dashboard():
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    return render_template(
+        "dashboard.html",
+        email=session.get("user_email"),
+        plan=session.get("plan")
+    )
 
 @app.route("/candidate-matcher", methods=["GET", "POST"])
 def index():
@@ -319,6 +614,217 @@ def resume_writer():
         years_experience=years_of_experience()
     )
 
+@app.route("/resume-builder", methods=["GET", "POST"])
+def resume_builder():
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    user_id = session.get("user_id")
+    plan = session.get("plan", "free")
+
+    if request.method == "POST":
+        if not can_use_resume(user_id, plan):
+            return render_template(
+                "resume_builder.html",
+                limit_reached=True,
+                plan=plan
+            )
+
+        template_choice = request.form.get("template_choice")
+        resume_source = request.form.get("resume_source")
+
+        existing_resume_text = ""
+        manual_info = {}
+
+        if resume_source == "upload":
+            resume_file = request.files.get("resume_file")
+
+            if resume_file and resume_file.filename != "":
+                resume_path = os.path.join(app.config["UPLOAD_FOLDER"], resume_file.filename)
+                resume_file.save(resume_path)
+                existing_resume_text = read_file(resume_path)
+
+                if os.path.exists(resume_path):
+                    os.remove(resume_path)
+
+        else:
+            manual_info = {
+                "full_name": request.form.get("full_name", "").strip(),
+                "email": request.form.get("email", "").strip(),
+                "phone": request.form.get("phone", "").strip(),
+                "linkedin": request.form.get("linkedin", "").strip(),
+                "location": request.form.get("location", "").strip(),
+                "education": request.form.get("education", "").strip(),
+                "work_history": request.form.get("work_history", "").strip(),
+                "certifications": request.form.get("certifications", "").strip(),
+                "tools": request.form.get("tools", "").strip(),
+                "languages": request.form.get("languages", "").strip(),
+            }
+
+        job_description = request.form.get("job_description", "").strip()
+
+        jd_file = request.files.get("job_description_file")
+        if jd_file and jd_file.filename != "":
+            jd_path = os.path.join(app.config["UPLOAD_FOLDER"], jd_file.filename)
+            jd_file.save(jd_path)
+            job_description += "\n" + read_file(jd_path)
+
+            if os.path.exists(jd_path):
+                os.remove(jd_path)
+
+        candidate_info = (
+            existing_resume_text
+            if resume_source == "upload"
+            else str(manual_info)
+        )
+
+        ai_output = generate_ai_resume_content(
+            candidate_info,
+            job_description
+        )
+
+        print("AI OUTPUT:")
+        print(ai_output)
+        print("----------------")
+
+        ai_sections = parse_ai_resume_sections(ai_output)
+
+        preview_data = {
+            "template_choice": template_choice,
+            "full_name": manual_info.get("full_name", ""),
+            "email": manual_info.get("email", session.get("user_email")),
+            "phone": manual_info.get("phone", ""),
+            "linkedin": manual_info.get("linkedin", ""),
+            "location": manual_info.get("location", ""),
+            "education": manual_info.get("education", ""),
+            "certifications": manual_info.get("certifications", ""),
+            "tools": manual_info.get("tools", ""),
+            "languages": manual_info.get("languages", ""),
+            "summary": ai_sections["summary"],
+            "skills": ai_sections["skills"],
+            "experience": ai_sections["experience"],
+            "achievements": ai_sections["achievements"],
+            "leadership_summary": ai_sections["leadership"]
+        }
+
+        session["resume_preview_data"] = preview_data
+        increment_resume_usage(user_id)
+        return redirect("/resume-preview")  
+
+    usage = get_usage(user_id)
+
+    return render_template(
+        "resume_builder.html",
+        plan=plan,
+        usage=usage
+    )
+
+@app.route("/resume-preview")
+def resume_preview():
+    if not session.get("resume_preview_data"):
+        return redirect("/resume-builder")
+
+    data = session["resume_preview_data"]
+
+    template_choice = data.get("template_choice", "professional")
+
+    template_map = {
+        "professional": "resume_templates/professional.html",
+        "modern": "resume_templates/modern.html",
+        "executive": "resume_templates/executive.html"
+    }
+
+    template_file = template_map.get(
+        template_choice,
+        "resume_templates/professional.html"
+    )
+
+    return render_template(
+        "resume_preview.html",
+        selected_template=template_file,
+        full_name=data.get("full_name", "John Doe"),
+        email=data.get("email", ""),
+        phone=data.get("phone", ""),
+        linkedin=data.get("linkedin", ""),
+        location=data.get("location", ""),
+        summary=data.get("summary", "AI-generated executive summary will appear here."),
+        leadership_summary=data.get("leadership_summary", "Leadership summary placeholder."),
+        skills=data.get("skills", "Sales, SaaS, Leadership, Strategy"),
+        experience=data.get("experience", "<p><strong>Sample Employer</strong> — Example Role</p><ul><li>Sample accomplishment</li></ul>"),
+        achievements=data.get("achievements", "Revenue growth, pipeline expansion, strategic leadership"),
+        education=data.get("education", ""),
+        certifications=data.get("certifications", ""),
+        tools=data.get("tools", ""),
+        languages=data.get("languages", "")
+    )
+
+@app.route("/download-resume-pdf")
+def download_resume_pdf():
+    if not session.get("resume_preview_data"):
+        return redirect("/resume-builder")
+
+    data = session["resume_preview_data"]
+    template_choice = data.get("template_choice", "professional")
+
+    template_map = {
+        "professional": "resume_templates/professional.html",
+        "modern": "resume_templates/modern.html",
+        "executive": "resume_templates/executive.html"
+    }
+
+    template_file = template_map.get(
+        template_choice,
+        "resume_templates/professional.html"
+    )
+
+    html = render_template(
+        "resume_preview.html",
+        selected_template=template_file,
+        full_name=data.get("full_name", "Resume"),
+        email=data.get("email", ""),
+        phone=data.get("phone", ""),
+        linkedin=data.get("linkedin", ""),
+        location=data.get("location", ""),
+        summary=data.get("summary", ""),
+        leadership_summary=data.get("leadership_summary", ""),
+        skills=data.get("skills", ""),
+        experience=data.get("experience", ""),
+        achievements=data.get("achievements", ""),
+        education=data.get("education", ""),
+        certifications=data.get("certifications", ""),
+        tools=data.get("tools", ""),
+        languages=data.get("languages", ""),
+        pdf_mode=True
+    )
+
+    pdf = BytesIO()
+    pisa_status = pisa.CreatePDF(html, dest=pdf)
+
+    if pisa_status.err:
+        return "PDF generation failed", 500
+
+    pdf.seek(0)
+
+    response = make_response(pdf.read())
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = "attachment; filename=resume.pdf"
+
+    return response
+
+@app.route("/reset-usage")
+def reset_usage():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE usage_tracking
+        SET resumes_used = 0
+    """)
+
+    conn.commit()
+    conn.close()
+
+    return "Usage reset"
 
 @app.route("/candidate-sourcing")
 def candidate_sourcing():
@@ -418,85 +924,30 @@ def save_seen_job(alert_id, job):
     conn.close()
 
 def send_job_alert_email(to_email, job):
-    api_key = os.environ.get("SENDGRID_API_KEY")
-    from_email = os.environ.get("FROM_EMAIL")
-
-    if not api_key or not from_email:
-        print("Missing SendGrid environment variables")
-        return False
-
-    subject = f"New Job Alert: {job.get('job_title')}"
-
-    company = job.get("employer_name", "Unknown Company")
-    title = job.get("job_title", "Unknown Role")
-    link = job.get("job_apply_link", "#")
-
-    html_content = f"""
-    <h2>New Job Match Found</h2>
-    <p><strong>Role:</strong> {title}</p>
-    <p><strong>Company:</strong> {company}</p>
-    <p>
-        <a href="{link}">
-            View Job / Apply Now
-        </a>
-    </p>
-    <p>Apply quickly — early applicants often get more visibility.</p>
-    """
-
-    message = Mail(
-        from_email=from_email,
-        to_emails=to_email,
-        subject=subject,
-        html_content=html_content
-    )
-
-    try:
-        sg = SendGridAPIClient(api_key)
-        response = sg.send(message)
-        print("EMAIL STATUS:", response.status_code)
-        return True
-
-    except Exception as e:
-        print("Email error:", e)
-        return False
-
-def get_user_alert_status(email):
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT COUNT(*) as alert_count,
-               MAX(COALESCE(is_premium, 0)) as is_premium
-        FROM job_alerts
-        WHERE email = ?
-    """, (email,))
-
-    row = cursor.fetchone()
-    conn.close()
-
-    return {
-        "alert_count": row["alert_count"],
-        "is_premium": bool(row["is_premium"])
-    }
+    print("Job alert email sending is currently disabled.")
+    return False
 
 @app.route("/job-alerts", methods=["GET", "POST"])
 def job_alerts():
+    if not session.get("user_id"):
+        return redirect("/login")
+
+    user_id = session.get("user_id")
+    email = session.get("user_email")
+    plan = session.get("plan", "free")
+
     if request.method == "POST":
+        if not can_use_job_alert(user_id, plan):
+            return render_template(
+                "job_alerts.html",
+                limit_reached=True,
+                plan=plan
+            )
+
         job_title = request.form.get("job_title", "").strip()
         location = request.form.get("location", "").strip()
         work_type = request.form.get("work_type", "").strip()
         keywords = request.form.get("keywords", "").strip()
-        email = request.form.get("email", "").strip()
-
-        user_status = get_user_alert_status(email)
-        print("USER STATUS:", user_status)
-
-        if user_status["alert_count"] >= 1 and not user_status["is_premium"]:
-            return render_template(
-                "job_alerts.html",
-                limit_reached=True
-            )
 
         search_terms = job_title
 
@@ -525,19 +976,28 @@ def job_alerts():
             keywords,
             email,
             linkedin_url,
-            1 if user_status["is_premium"] else 0
+            1 if plan in ["pro", "accelerator"] else 0
         ))
 
         conn.commit()
         conn.close()
 
+        increment_job_alert_usage(user_id)
+
         return render_template(
             "job_alerts.html",
             success=True,
-            linkedin_url=linkedin_url
+            linkedin_url=linkedin_url,
+            plan=plan
         )
 
-    return render_template("job_alerts.html")
+    usage = get_usage(user_id)
+
+    return render_template(
+        "job_alerts.html",
+        plan=plan,
+        usage=usage
+    )
 
 @app.route("/test-job-search")
 def test_job_search():
@@ -568,8 +1028,6 @@ def test_check_alerts():
 
             if is_new_job(alert["id"], job_id):
                 save_seen_job(alert["id"], job)
-
-                send_job_alert_email(alert["email"], job)
 
                 new_jobs_found.append({
                     "alert_email": alert["email"],
@@ -603,14 +1061,6 @@ def check_alerts_and_send_emails():
             if is_new_job(alert["id"], job_id):
                 save_seen_job(alert["id"], job)
                 send_job_alert_email(alert["email"], job)
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(
-    func=check_alerts_and_send_emails,
-    trigger="interval",
-    hours=1
-)
-scheduler.start()
 
 @app.route("/create-checkout-session")
 def create_checkout_session():
@@ -713,7 +1163,7 @@ def admin_dashboard():
     premium_users = cursor.fetchone()["premium_users"]
 
     free_users = total_users - premium_users
-    mrr = premium_users * 9
+    mrr = premium_users * 15
 
     cursor.execute("""
         SELECT job_title, COUNT(*) AS count

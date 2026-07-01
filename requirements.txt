@@ -6,3 +6,7 @@ requests
 apscheduler
 sendgrid
 stripe
+werkzeug
+reportlab
+openai
+xhtml2pdf

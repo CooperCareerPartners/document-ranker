@@ -1,0 +1,41 @@
+<div class="resume professional">
+    <header>
+        <h1>{{ full_name }}</h1>
+        <p>{{ email }} | {{ phone }} | {{ location }} | {{ linkedin }}</p>
+    </header>
+
+    <section>
+        <h2>Executive Summary</h2>
+        <p>{{ summary }}</p>
+    </section>
+
+    <section>
+        <h2>Core Skills</h2>
+        <p>{{ skills }}</p>
+    </section>
+
+    <section>
+        <h2>Professional Experience</h2>
+        {{ experience|safe }}
+    </section>
+
+    <section>
+        <h2>Education</h2>
+        <p>{{ education }}</p>
+    </section>
+
+    <section>
+        <h2>Certifications</h2>
+        <p>{{ certifications }}</p>
+    </section>
+
+    <section>
+        <h2>Tools & Technologies</h2>
+        <p>{{ tools }}</p>
+    </section>
+
+    <section>
+        <h2>Languages</h2>
+        <p>{{ languages }}</p>
+    </section>
+</div>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Builder | Cooper Career Partners</title>
+
+    <style>
+        .resume {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 50px;
+            background: white;
+            color: #111827;
+            font-family: Arial, sans-serif;
+            line-height: 1.45;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .resume h1 {
+            margin-bottom: 6px;
+            font-size: 32px;
+            letter-spacing: 0.5px;
+        }
+
+        .resume header {
+            text-align: center;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .resume h2 {
+            font-size: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #d1d5db;
+            padding-bottom: 5px;
+            margin-top: 24px;
+            letter-spacing: 0.8px;
+        }
+
+        .resume p {
+            font-size: 14px;
+        }
+
+        .modern header {
+            background: #eff6ff;
+            border-bottom: 4px solid #2563eb;
+            padding: 24px;
+        }
+
+        .modern h2 {
+            color: #2563eb;
+        }
+
+        .executive {
+            font-family: Georgia, serif;
+        }
+
+        .executive header {
+            border-bottom: 3px double #111827;
+        }
+
+        .executive h1 {
+            font-size: 36px;
+        }
+
+        .executive h2 {
+            font-size: 14px;
+            letter-spacing: 1.2px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>AI Resume Builder</h1>
+
+<p>
+    This tool helps you create an ATS-optimized resume tailored to a specific job.
+    You will choose a resume template, either upload an existing resume or enter your
+    information manually, then provide a job description. The system will use that
+    information to create a polished resume and generate a PDF download.
+</p>
+
+<h2>Before You Start</h2>
+<ul>
+    <li>Have your current resume ready, if you have one.</li>
+    <li>Have the job description for the role you want to apply to.</li>
+    <li>Be ready to provide education, work history, certifications, tools, and languages.</li>
+</ul>
+
+{% if plan %}
+<p>Current Plan: <strong>{{ plan|capitalize }}</strong></p>
+{% endif %}
+
+{% if usage and plan != "accelerator" %}
+<p>Resume Downloads Used: {{ usage.resumes_used }}</p>
+{% endif %}
+
+{% if limit_reached %}
+<div style="background:#fee2e2; color:#991b1b; padding:15px;">
+    <strong>Resume limit reached.</strong>
+    <p>You have reached your resume download limit for your current plan.</p>
+    <a href="/pricing">Upgrade Your Plan</a>
+</div>
+{% endif %}
+
+{% if success %}
+<div style="background:#dcfce7; color:#166534; padding:15px;">
+    <strong>Resume builder submission received.</strong>
+    <p>Template selected: {{ template_choice }}</p>
+    <p>Resume source: {{ resume_source }}</p>
+    <p>Next step: AI resume generation and PDF download.</p>
+</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+
+    <h2>Step 1: Choose Your Resume Template</h2>
+
+    <label>
+        <input type="radio" name="template_choice" value="professional" required>
+        Professional ATS Template
+    </label><br>
+
+    <label>
+        <input type="radio" name="template_choice" value="modern" required>
+        Modern ATS Template
+    </label><br>
+
+    <label>
+        <input type="radio" name="template_choice" value="executive" required>
+        Executive ATS Template
+    </label><br>
+
+    <h2>Step 2: Do You Have an Existing Resume?</h2>
+
+    <label>
+        <input type="radio" name="resume_source" value="upload" required>
+        Yes, I want to upload my resume
+    </label><br>
+
+    <label>
+        <input type="radio" name="resume_source" value="manual" required>
+        No, I want to enter my information manually
+    </label>
+
+    <h2>Step 3A: Upload Resume</h2>
+    <p>Upload a PDF or DOCX resume if you selected upload.</p>
+    <input type="file" name="resume_file" accept=".pdf,.docx">
+
+    <h2>Step 3B: Manual Resume Information</h2>
+
+    <label>Full Name</label><br>
+    <input type="text" name="full_name"><br><br>
+
+    <label>Email</label><br>
+    <input type="email" name="email"><br><br>
+
+    <label>Phone</label><br>
+    <input type="text" name="phone"><br><br>
+
+    <label>LinkedIn</label><br>
+    <input type="text" name="linkedin"><br><br>
+
+    <label>Location</label><br>
+    <input type="text" name="location"><br><br>
+
+    <label>Education History</label><br>
+    <textarea name="education" rows="5"></textarea><br><br>
+
+    <label>Work History</label><br>
+    <textarea name="work_history" rows="8" placeholder="Employer, dates employed, position, responsibilities"></textarea><br><br>
+
+    <label>Certifications</label><br>
+    <textarea name="certifications" rows="4"></textarea><br><br>
+
+    <label>Software / Tools</label><br>
+    <textarea name="tools" rows="4"></textarea><br><br>
+
+    <label>Languages</label><br>
+    <textarea name="languages" rows="4"></textarea><br><br>
+
+    <h2>Step 4: Target Job Description</h2>
+
+    <label>Paste Job Description</label><br>
+    <textarea name="job_description" rows="10"></textarea><br><br>
+
+    <label>Or Upload Job Description</label><br>
+    <input type="file" name="job_description_file" accept=".pdf,.docx"><br><br>
+
+    <button type="submit">Generate Resume Draft</button>
+
+</form>
+
+</body>
+</html>

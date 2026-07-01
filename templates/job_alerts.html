@@ -247,8 +247,8 @@
     <div class="tag">Early Applicant Advantage</div>
     <h1>Get job alerts faster so you can apply before the crowd.</h1>
     <p>
-        Create a personalized job alert based on title, location, work type, and keywords.
-        When new matching roles are found, you’ll receive an email alert with an apply link.
+        Save personalized job searches based on title, location, work type, and keywords.
+        Your alerts will be stored in your dashboard.
     </p>
 </section>
 
@@ -299,9 +299,9 @@
 
         {% if limit_reached %}
         <div class="success" style="background:#fee2e2; color:#991b1b;">
-            <strong>Free alert limit reached.</strong>
-            <p>You already have 1 free job alert. Upgrade to Premium to create unlimited alerts.</p>
-            <a class="button" href="/create-checkout-session">Upgrade to Premium</a>
+            <strong>Plan limit reached.</strong>
+            <p>You have reached the job alert limit for your current plan.</p>
+            <a class="button" href="/pricing">Upgrade Your Plan</a>
         </div>
         {% endif %}
 
@@ -335,8 +335,9 @@
             <textarea name="keywords" placeholder="Example: SaaS, healthcare, AI, startup, Salesforce"></textarea>
             <div class="helper">Use keywords to make your alert more specific.</div>
 
-            <label>Email Address</label>
-            <input type="email" name="email" placeholder="you@example.com" required>
+           <p>
+                Logged in as: <strong>{{ session.user_email }}</strong>
+            </p>
 
             <button type="submit">Create Job Alert</button>
 
@@ -364,10 +365,10 @@
 
         <div class="price-card featured">
             <h3>Premium Alerts</h3>
-            <div class="price">$9/mo</div>
+            <div class="price">$15/mo</div>
             <p>For job seekers who want more coverage and faster action.</p>
             <ul>
-                <li>Unlimited job alerts</li>
+                <li>5 saved job alerts</li>
                 <li>Priority job checks</li>
                 <li>Multiple job titles and locations</li>
                 <li>Early applicant strategy tips</li>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Preview | Cooper Career Partners</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #f1f5f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .topbar {
+            background: #0f172a;
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .topbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+            font-weight: bold;
+        }
+
+        .resume {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 50px;
+            background: white;
+            color: #111827;
+            line-height: 1.45;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .resume h1 {
+            margin-bottom: 6px;
+            font-size: 32px;
+            letter-spacing: 0.5px;
+        }
+
+        .resume header {
+            text-align: center;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .resume h2 {
+            font-size: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #d1d5db;
+            padding-bottom: 5px;
+            margin-top: 24px;
+            letter-spacing: 0.8px;
+        }
+
+        .resume p {
+            font-size: 14px;
+        }
+
+        .modern header {
+            background: #eff6ff;
+            border-bottom: 4px solid #2563eb;
+            padding: 24px;
+        }
+
+        .modern h2 {
+            color: #2563eb;
+        }
+
+        .executive {
+            font-family: Georgia, serif;
+        }
+
+        .executive header {
+            border-bottom: 3px double #111827;
+        }
+
+        .executive h1 {
+            font-size: 36px;
+        }
+
+        .actions {
+            max-width: 850px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <strong>Cooper Career Partners</strong>
+    <div>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/resume-builder">Edit Resume</a>
+    </div>
+</div>
+
+<div class="actions">
+    <a class="button" href="/resume-builder">Edit Information</a>
+    <a class="button" href="/download-resume-pdf">Download PDF</a>
+</div>
+
+{% include selected_template %}
+
+</body>
+</html>
