@@ -1060,7 +1060,7 @@ def check_alerts_and_send_emails():
 
             if is_new_job(alert["id"], job_id):
                 save_seen_job(alert["id"], job)
-                send_job_alert_email(alert["email"], job)
+               # send_job_alert_email(alert["email"], job)
 
 @app.route("/create-checkout-session")
 def create_checkout_session():
